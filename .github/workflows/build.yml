@@ -27,11 +27,11 @@ jobs:
         id: init
         run: |
           VERSION=$(grep "version" gradle.properties | cut -d'=' -f2)
-          echo ::set-output name=version::${VERSION}
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
           if [[ $VERSION =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
-            echo ::set-output name=release::true
+            echo "release=true" >> $GITHUB_OUTPUT
           else
-            echo ::set-output name=release::false
+            echo "release=false" >> $GITHUB_OUTPUT
           fi
 
   snapshot:
@@ -41,7 +41,7 @@ jobs:
       fail-fast: false
       matrix:
         java:
-          - 11
+          - 17
     steps:
       -
         name: Checkout
@@ -67,7 +67,7 @@ jobs:
           ./gradlew clean build
       -
         name: Archive artifact
-        if: success() && matrix.java == '11'
+        if: success() && matrix.java == '17'
         uses: actions/upload-artifact@v3
         with:
           name: snapshot
@@ -77,6 +77,11 @@ jobs:
     needs: prep
     if: github.event_name != 'pull_request' && needs.prep.outputs.release == 'true'
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        java:
+          - 17
     steps:
       -
         name: Checkout
@@ -84,10 +89,10 @@ jobs:
         with:
           fetch-depth: 0
       -
-        name: Set up Java
+        name: Set up Java ${{ matrix.java }}
         uses: actions/setup-java@v3
         with:
-          java-version: 11
+          java-version: ${{ matrix.java }}
           java-package: jdk
           distribution: 'zulu'
       -
@@ -148,7 +153,7 @@ jobs:
         name: Set up Java
         uses: actions/setup-java@v3
         with:
-          java-version: 11
+          java-version: 17
           java-package: jdk
           distribution: 'zulu'
       -
