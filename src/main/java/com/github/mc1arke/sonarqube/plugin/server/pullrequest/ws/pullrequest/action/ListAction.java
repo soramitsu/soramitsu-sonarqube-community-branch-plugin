@@ -90,13 +90,13 @@ public class ListAction extends ProjectWsAction {
                 .map(BranchDto::getMergeBranchUuid)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList()))
-            .stream().collect(MoreCollectors.uniqueIndex(BranchDto::getUuid));
+            .stream().collect(CommunityMoreCollectors.uniqueIndex(BranchDto::getUuid));
 
         Map<String, LiveMeasureDto> qualityGateMeasuresByComponentUuids = getDbClient().liveMeasureDao()
             .selectByComponentUuidsAndMetricKeys(dbSession, pullRequestUuids, List.of(CoreMetrics.ALERT_STATUS_KEY)).stream()
-            .collect(MoreCollectors.uniqueIndex(LiveMeasureDto::getComponentUuid));
+            .collect(CommunityMoreCollectors.uniqueIndex(LiveMeasureDto::getComponentUuid));
         Map<String, String> analysisDateByBranchUuid = getDbClient().snapshotDao().selectLastAnalysesByRootComponentUuids(dbSession, pullRequestUuids).stream()
-            .collect(MoreCollectors.uniqueIndex(SnapshotDto::getComponentUuid, s -> DateUtils.formatDateTime(s.getCreatedAt())));
+            .collect(CommunityMoreCollectors.uniqueIndex(SnapshotDto::getComponentUuid, s -> DateUtils.formatDateTime(s.getCreatedAt())));
 
         ProjectPullRequests.ListWsResponse.Builder protobufResponse = ProjectPullRequests.ListWsResponse.newBuilder();
         pullRequests
@@ -106,8 +106,8 @@ public class ListAction extends ProjectWsAction {
     }
 
     private static void checkPermission(ProjectDto project, UserSession userSession) {
-        if (userSession.hasProjectPermission(UserRole.USER, project) ||
-            userSession.hasProjectPermission(UserRole.SCAN, project) ||
+        if (userSession.hasEntityPermission(UserRole.USER, project) ||
+            userSession.hasEntityPermission(UserRole.SCAN, project) ||
             userSession.hasPermission(GlobalPermission.SCAN)) {
             return;
         }
