@@ -174,7 +174,7 @@ class AnalysisDetailsTest {
         QualityGate.Condition condition3 = mock(QualityGate.Condition.class);
         when(condition3.getStatus()).thenReturn(QualityGate.EvaluationStatus.NO_VALUE);
         QualityGate.Condition condition4 = mock(QualityGate.Condition.class);
-        when(condition4.getStatus()).thenReturn(QualityGate.EvaluationStatus.ERROR)
+        when(condition4.getStatus()).thenReturn(QualityGate.EvaluationStatus.ERROR);
 
         when(qualityGate.getConditions()).thenReturn(List.of(condition1, condition2, condition3, condition4));
 
