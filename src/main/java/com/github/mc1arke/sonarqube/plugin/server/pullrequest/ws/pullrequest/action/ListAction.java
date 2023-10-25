@@ -19,6 +19,7 @@ package com.github.mc1arke.sonarqube.plugin.server.pullrequest.ws.pullrequest.ac
 
 import static org.sonar.server.user.AbstractUserSession.insufficientPrivilegesException;
 
+import com.github.mc1arke.sonarqube.plugin.util.CommunityMoreCollectors;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
