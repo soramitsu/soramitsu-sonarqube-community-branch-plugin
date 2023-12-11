@@ -36,9 +36,9 @@ import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.sonar.api.SonarRuntime;
-import org.sonar.core.platform.EditionProvider;
 import org.sonar.core.documentation.DefaultDocumentationLinkGenerator;
 import org.sonar.core.documentation.DocumentationLinkGenerator;
+import org.sonar.core.platform.EditionProvider;
 import org.sonar.core.platform.PlatformEditionProvider;
 import org.sonar.db.DbClient;
 import org.sonar.db.newcodeperiod.NewCodePeriodDao;
@@ -106,8 +106,8 @@ class CommunityBranchAgentTest {
             PlatformEditionProvider platformEditionProvider = mock(PlatformEditionProvider.class);
             NewCodePeriodDao newCodePeriodDao = mock(NewCodePeriodDao.class);
 
-            Object setAction = setActionClass.getConstructor(DbClient.class, UserSession.class, ComponentFinder.class, PlatformEditionProvider.class, NewCodePeriodDao.class, DocumentationLinkGenerator.class)
-                    .newInstance(dbClient, userSession, componentFinder, platformEditionProvider, newCodePeriodDao, documentationLinkGenerator);
+      Object setAction = setActionClass.getConstructor(DbClient.class, UserSession.class, ComponentFinder.class, PlatformEditionProvider.class, NewCodePeriodDao.class, DocumentationLinkGenerator.class)
+              .newInstance(dbClient, userSession, componentFinder, platformEditionProvider, newCodePeriodDao, documentationLinkGenerator);
 
             Field editionProviderField = setActionClass.getDeclaredField("editionProvider");
             editionProviderField.setAccessible(true);

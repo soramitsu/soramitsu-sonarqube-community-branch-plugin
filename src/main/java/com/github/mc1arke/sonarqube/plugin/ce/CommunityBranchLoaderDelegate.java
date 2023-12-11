@@ -102,7 +102,13 @@ public class CommunityBranchLoaderDelegate implements BranchLoaderDelegate {
     private static Branch createBranch(DbClient dbClient, String branchName, String projectUuid, String targetBranch) {
         String targetUuid;
         if (null == targetBranch) {
-            targetUuid = projectUuid;
+            Optional<BranchDto> branchDto = findBranchByUuid(dbClient, projectUuid);
+            if (branchDto.isPresent()) {
+                targetUuid = branchDto.get().getUuid();
+            } else {
+                throw new IllegalStateException(
+                        String.format("Could not find main branch within project '%s'", projectUuid));
+            }
         } else {
             Optional<BranchDto> branchDto = findBranchByKey(projectUuid, targetBranch, dbClient);
             if (branchDto.isPresent()) {
@@ -119,7 +125,7 @@ public class CommunityBranchLoaderDelegate implements BranchLoaderDelegate {
 
     private static Optional<BranchDto> findBranchByUuid(String projectUuid, DbClient dbClient) {
         try (DbSession dbSession = dbClient.openSession(false)) {
-            return dbClient.branchDao().selectByUuid(dbSession, projectUuid);
+            return dbClient.branchDao().selectMainBranchByProjectUuid(dbSession, projectUuid);
         }
     }
 
