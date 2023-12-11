@@ -102,7 +102,7 @@ public class CommunityBranchLoaderDelegate implements BranchLoaderDelegate {
     private static Branch createBranch(DbClient dbClient, String branchName, String projectUuid, String targetBranch) {
         String targetUuid;
         if (null == targetBranch) {
-            Optional<BranchDto> branchDto = findBranchByUuid(dbClient, projectUuid);
+            Optional<BranchDto> branchDto = findBranchByUuid(projectUuid, dbClient);
             if (branchDto.isPresent()) {
                 targetUuid = branchDto.get().getUuid();
             } else {
