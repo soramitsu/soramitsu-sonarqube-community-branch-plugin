@@ -96,7 +96,6 @@ public class CommunityBranchSupportDelegate implements BranchSupportDelegate {
             .setUuid(branchUuid)
             .setBranchUuid(branchUuid)
             .setUuidPath(ComponentDto.UUID_PATH_OF_ROOT)
-            .setMainBranchProjectUuid(mainComponentDto.uuid())
             .setCreatedAt(new Date(clock.millis()));
         dbClient.componentDao().insert(dbSession, componentDto, false);
 
@@ -111,6 +110,7 @@ public class CommunityBranchSupportDelegate implements BranchSupportDelegate {
             .setExcludeFromPurge(isBranchExcludedFromPurge(projectConfigurationLoader.loadProjectConfiguration(dbSession, branchDto.getProjectUuid()), branchName))
             .setKey(branchName)
             .setIsMain(false));
+        branchDto.setProjectUuid(mainComponentBranchDto.getProjectUuid());
         dbClient.branchDao().insert(dbSession, branchDto);
 
         return componentDto;

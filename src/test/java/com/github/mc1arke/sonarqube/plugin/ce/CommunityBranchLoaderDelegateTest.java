@@ -91,7 +91,7 @@ public class CommunityBranchLoaderDelegateTest {
         when(branchDto.isMain()).thenReturn(false);
 
         BranchDao branchDao = mock(BranchDao.class);
-        when(branchDao.selectByUuid(any(), any())).thenReturn(Optional.of(branchDto));
+        when(branchDao.selectMainBranchByProjectUuid(any(), any())).thenReturn(Optional.of(branchDto));
 
         ScannerReport.Metadata metadata = ScannerReport.Metadata.getDefaultInstance();
         when(dbClient.branchDao()).thenReturn(branchDao);
@@ -118,7 +118,7 @@ public class CommunityBranchLoaderDelegateTest {
         verify(dbClient).openSession(anyBoolean());
         verifyNoMoreInteractions(dbClient);
 
-        verify(branchDao).selectByUuid(any(), any());
+        verify(branchDao).selectMainBranchByProjectUuid(any(), any());
         verifyNoMoreInteractions(branchDao);
     }
 
@@ -139,50 +139,6 @@ public class CommunityBranchLoaderDelegateTest {
         expectedException.expectMessage(IsEqual.equalTo("Invalid branch type 'UNSET'"));
 
         testCase.load(metadata);
-    }
-
-    @Test
-    public void testBranchNameMatchingBranch() {
-        BranchDto branchDto = mock(BranchDto.class);
-        when(branchDto.getBranchType()).thenReturn(BranchType.BRANCH);
-        when(branchDto.getKey()).thenReturn("branchKey");
-        when(branchDto.getMergeBranchUuid()).thenReturn("mergeBranchUuid");
-        when(branchDto.getProjectUuid()).thenReturn("projectUuid");
-        when(branchDto.getUuid()).thenReturn("branchUuid");
-
-        BranchDao branchDao = mock(BranchDao.class);
-        when(branchDao.selectByBranchKey(any(), eq("projectUuid"), eq("branch"))).thenReturn(Optional.of(branchDto));
-
-        ScannerReport.Metadata metadata =
-                ScannerReport.Metadata.getDefaultInstance().toBuilder().setBranchName("branch")
-                        .setBranchType(ScannerReport.Metadata.BranchType.BRANCH).build();
-
-        when(dbClient.branchDao()).thenReturn(branchDao);
-
-        when(metadataHolder.getProject()).thenReturn(new Project("projectUuid", "key", "name", "description", new ArrayList<>()));
-
-        testCase.load(metadata);
-
-        ArgumentCaptor<Branch> branchArgumentCaptor = ArgumentCaptor.forClass(Branch.class);
-
-        verify(metadataHolder).setBranch(branchArgumentCaptor.capture());
-        assertEquals(BranchType.BRANCH, branchArgumentCaptor.getValue().getType());
-        assertEquals("projectUuid", branchArgumentCaptor.getValue().getReferenceBranchUuid());
-        assertEquals("branch", branchArgumentCaptor.getValue().getName());
-        assertFalse(branchArgumentCaptor.getValue().isMain());
-        assertFalse(branchArgumentCaptor.getValue().supportsCrossProjectCpd());
-
-        verify(metadataHolder).getProject();
-        verify(metadataHolder).setPullRequestKey(anyString());
-
-        verifyNoMoreInteractions(metadataHolder);
-
-        verify(dbClient).branchDao();
-        verify(dbClient).openSession(anyBoolean());
-        verifyNoMoreInteractions(dbClient);
-
-        verify(branchDao).selectByBranchKey(any(), any(), any());
-        verifyNoMoreInteractions(branchDao);
     }
 
     @Test
