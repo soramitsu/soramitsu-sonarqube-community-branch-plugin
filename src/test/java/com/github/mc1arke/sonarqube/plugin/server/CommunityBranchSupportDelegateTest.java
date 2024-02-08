@@ -34,7 +34,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -141,7 +140,6 @@ class CommunityBranchSupportDelegateTest {
        );
     }
 
-    @Disabled("No time for fix this test")
     @MethodSource("shouldCreateComponentAndBranchDtoIfValidationPassesData")
     @ParameterizedTest
     void shouldCreateComponentAndBranchDtoIfValidationPasses(String branchName, String pullRequestKey, BranchType branchType,
@@ -161,7 +159,7 @@ class CommunityBranchSupportDelegateTest {
         when(copyComponentDto.setCreatedAt(any())).thenReturn(copyComponentDto);
 
         BranchDto branchDto = mock(BranchDto.class);
-        when(branchDto.getUuid()).thenReturn("componentUuid");
+        when(branchDto.getProjectUuid()).thenReturn("projectUuid");
         when(branchDto.getKey()).thenReturn("nonDummy");
 
         when(clock.millis()).thenReturn(12345678901234L);
@@ -197,7 +195,7 @@ class CommunityBranchSupportDelegateTest {
         assertThat(branchDtoArgumentCaptor.getValue()).usingRecursiveComparison().isEqualTo(new BranchDto()
             .setBranchType(branchType)
             .setExcludeFromPurge(excludedFromPurge)
-            .setProjectUuid("componentUuid")
+            .setProjectUuid("projectUuid")
             .setKey(branchType == BranchType.BRANCH ? branchName : pullRequestKey)
             .setUuid("uuid0")
             .setIsMain(false));

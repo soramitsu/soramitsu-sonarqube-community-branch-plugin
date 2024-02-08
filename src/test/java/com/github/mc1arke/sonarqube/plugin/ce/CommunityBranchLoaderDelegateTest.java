@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Michael Clarke
+ * Copyright (C) 2020-2023 Michael Clarke
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -139,6 +139,50 @@ public class CommunityBranchLoaderDelegateTest {
         expectedException.expectMessage(IsEqual.equalTo("Invalid branch type 'UNSET'"));
 
         testCase.load(metadata);
+    }
+
+    @Test
+    public void testBranchNameMatchingBranch() {
+        BranchDto branchDto = mock(BranchDto.class);
+        when(branchDto.getBranchType()).thenReturn(BranchType.BRANCH);
+        when(branchDto.getKey()).thenReturn("branchKey");
+        when(branchDto.getMergeBranchUuid()).thenReturn("mergeBranchUuid");
+        when(branchDto.getProjectUuid()).thenReturn("projectUuid");
+        when(branchDto.getUuid()).thenReturn("branchUuid");
+
+        BranchDao branchDao = mock(BranchDao.class);
+        when(branchDao.selectByBranchKey(any(), eq("projectUuid"), eq("branch"))).thenReturn(Optional.of(branchDto));
+
+        ScannerReport.Metadata metadata =
+                ScannerReport.Metadata.getDefaultInstance().toBuilder().setBranchName("branch")
+                        .setBranchType(ScannerReport.Metadata.BranchType.BRANCH).build();
+
+        when(dbClient.branchDao()).thenReturn(branchDao);
+
+        when(metadataHolder.getProject()).thenReturn(new Project("projectUuid", "key", "name", "description", new ArrayList<>()));
+
+        testCase.load(metadata);
+
+        ArgumentCaptor<Branch> branchArgumentCaptor = ArgumentCaptor.forClass(Branch.class);
+
+        verify(metadataHolder).setBranch(branchArgumentCaptor.capture());
+        assertEquals(BranchType.BRANCH, branchArgumentCaptor.getValue().getType());
+        assertEquals("projectUuid", branchArgumentCaptor.getValue().getReferenceBranchUuid());
+        assertEquals("branch", branchArgumentCaptor.getValue().getName());
+        assertFalse(branchArgumentCaptor.getValue().isMain());
+        assertFalse(branchArgumentCaptor.getValue().supportsCrossProjectCpd());
+
+        verify(metadataHolder).getProject();
+        verify(metadataHolder).setPullRequestKey(anyString());
+
+        verifyNoMoreInteractions(metadataHolder);
+
+        verify(dbClient).branchDao();
+        verify(dbClient).openSession(anyBoolean());
+        verifyNoMoreInteractions(dbClient);
+
+        verify(branchDao).selectByBranchKey(any(), any(), any());
+        verifyNoMoreInteractions(branchDao);
     }
 
     @Test
