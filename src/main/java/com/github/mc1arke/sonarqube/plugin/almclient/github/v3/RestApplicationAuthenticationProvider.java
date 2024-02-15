@@ -29,7 +29,6 @@ import com.github.mc1arke.sonarqube.plugin.almclient.github.v3.model.AppToken;
 import com.github.mc1arke.sonarqube.plugin.almclient.github.v3.model.InstallationRepositories;
 import com.github.mc1arke.sonarqube.plugin.almclient.github.v3.model.Repository;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.PEMParser;
