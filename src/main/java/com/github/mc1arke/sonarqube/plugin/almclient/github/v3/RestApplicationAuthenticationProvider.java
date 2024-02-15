@@ -78,7 +78,9 @@ public class RestApplicationAuthenticationProvider implements GithubApplicationA
 
         Instant issued = clock.instant().minus(10, ChronoUnit.SECONDS);
         Instant expiry = issued.plus(2, ChronoUnit.MINUTES);
-        String jwtToken = Jwts.builder().setIssuedAt(Date.from(issued)).setExpiration(Date.from(expiry))
+        Date createdDate = new Date();
+        Date expirationDate = new Date(createdDate.getTime() + 120 * 1000);
+        String jwtToken = Jwts.builder().setIssuedAt(createdDate).setExpiration(expirationDate)
                 .claim("iss", appId).signWith(createPrivateKey(apiPrivateKey), SignatureAlgorithm.RS256).compact();
 
         Optional<RepositoryAuthenticationToken> repositoryAuthenticationToken = findTokenFromAppInstallationList(getV3Url(apiUrl) + "/app/installations", jwtToken, projectPath);
