@@ -29,7 +29,6 @@ import com.github.mc1arke.sonarqube.plugin.almclient.github.v3.model.AppToken;
 import com.github.mc1arke.sonarqube.plugin.almclient.github.v3.model.InstallationRepositories;
 import com.github.mc1arke.sonarqube.plugin.almclient.github.v3.model.Repository;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.PEMParser;
@@ -79,16 +78,12 @@ public class RestApplicationAuthenticationProvider implements GithubApplicationA
 
         Instant issued = clock.instant().minus(10, ChronoUnit.SECONDS);
         Instant expiry = issued.plus(2, ChronoUnit.MINUTES);
-        long nowMillis = System.currentTimeMillis();
-        Date now = new Date(nowMillis);
-        long expMillis = nowMillis + 150 * 1000;
-        Date exp = new Date(expMillis);
-        JwtBuilder builder = null;
-        builder = Jwts.builder()
-                .setExpiration(exp)
+        String jwtToken = Jwts.builder()
+                .expiration(Date.from(expiry))
+                .issuedAt(Date.from(issued))
                 .claim("iss", appId)
-                .signWith(createPrivateKey(apiPrivateKey), SignatureAlgorithm.RS256);
-        String jwtToken = builder.compact();
+                .signWith(createPrivateKey(apiPrivateKey), SignatureAlgorithm.RS256)
+                .compact();
         Optional<RepositoryAuthenticationToken> repositoryAuthenticationToken = findTokenFromAppInstallationList(getV3Url(apiUrl) + "/app/installations", jwtToken, projectPath);
 
         return repositoryAuthenticationToken.orElseThrow(() -> new InvalidConfigurationException(InvalidConfigurationException.Scope.PROJECT,
