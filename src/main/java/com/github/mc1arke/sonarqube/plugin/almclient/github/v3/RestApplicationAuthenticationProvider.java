@@ -85,7 +85,6 @@ public class RestApplicationAuthenticationProvider implements GithubApplicationA
         Date exp = new Date(expMillis);
         JwtBuilder builder = null;
         builder = Jwts.builder()
-                .setIssuedAt(now)
                 .setExpiration(exp)
                 .claim("iss", appId)
                 .signWith(createPrivateKey(apiPrivateKey), SignatureAlgorithm.RS256);
