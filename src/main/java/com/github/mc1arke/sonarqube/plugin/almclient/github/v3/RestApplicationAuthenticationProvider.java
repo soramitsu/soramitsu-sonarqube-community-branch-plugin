@@ -78,12 +78,9 @@ public class RestApplicationAuthenticationProvider implements GithubApplicationA
 
         Instant issued = clock.instant().minus(10, ChronoUnit.SECONDS);
         Instant expiry = issued.plus(2, ChronoUnit.MINUTES);
-        String jwtToken = new DefaultJwtBuilder()
-                .expiration(Date.from(expiry))
-                .issuedAt(Date.from(issued))
-                .claim("iss", appId)
-                .signWith(createPrivateKey(apiPrivateKey), Jwts.SIG.RS256)
-                .compact();
+        String jwtToken = new DefaultJwtBuilder().issuedAt(Date.from(issued)).expiration(Date.from(expiry))
+                .claim("iss", appId).signWith(createPrivateKey(apiPrivateKey), Jwts.SIG.RS256).compact();
+
         Optional<RepositoryAuthenticationToken> repositoryAuthenticationToken = findTokenFromAppInstallationList(getV3Url(apiUrl) + "/app/installations", jwtToken, projectPath);
 
         return repositoryAuthenticationToken.orElseThrow(() -> new InvalidConfigurationException(InvalidConfigurationException.Scope.PROJECT,

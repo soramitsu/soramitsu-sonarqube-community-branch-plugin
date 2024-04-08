@@ -38,7 +38,7 @@ import static org.junit.Assert.assertNotSame;
  * @author Michael Clarke
  */
 public class ReflectiveElevatedClassLoaderFactoryTest {
-    
+
     private static final String TARGET_PLUGIN_CLASS = "org.sonar.plugins.java.JavaPlugin";
     private static final String BUNDLED_PLUGINS_DIRECTORY = "lib/extensions";
     private static final String SONARQUBE_LIB_DIRECTORY = "sonarqube-lib/";
