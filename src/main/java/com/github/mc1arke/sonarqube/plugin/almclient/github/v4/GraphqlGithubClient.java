@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2022 Michael Clarke
+ * Copyright (C) 2020-2023 Michael Clarke
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -31,8 +31,8 @@ import io.aexp.nodes.graphql.GraphQLResponseEntity;
 import io.aexp.nodes.graphql.GraphQLTemplate;
 import io.aexp.nodes.graphql.InputObject;
 import io.aexp.nodes.graphql.internal.Error;
-import org.sonar.api.utils.log.Logger;
-import org.sonar.api.utils.log.Loggers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -50,7 +50,7 @@ import static org.apache.commons.lang.ArrayUtils.isEmpty;
 
 public class GraphqlGithubClient implements GithubClient {
 
-    private static final Logger LOGGER = Loggers.get(GraphqlGithubClient.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GraphqlGithubClient.class);
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX")
             .withZone(ZoneId.of("UTC"));
     private static final String INPUT = "input";
@@ -116,7 +116,7 @@ public class GraphqlGithubClient implements GithubClient {
 
 
         if (postSummaryComment) {
-            postSummaryComment(graphqlUrl, headers, checkRunDetails.getPullRequestId(), checkRunDetails.getSummary());
+            postSummaryComment(graphqlUrl, headers, checkRunDetails.getPullRequestId(), checkRunDetails.getSummary(), checkRunDetails.getProjectKey());
         }
 
         return graphQLResponseEntity.getResponse().getCheckRun().getId();
@@ -128,7 +128,7 @@ public class GraphqlGithubClient implements GithubClient {
         return repositoryAuthenticationToken.getRepositoryUrl();
     }
 
-    private void postSummaryComment(String graphqlUrl, Map<String, String> headers, int pullRequestKey, String summary) throws IOException {
+    private void postSummaryComment(String graphqlUrl, Map<String, String> headers, int pullRequestKey, String summary, String projectId) throws IOException {
         String login = getLogin(graphqlUrl, headers);
 
         GetRepository.PullRequest pullRequest = getPullRequest(graphqlUrl, headers, pullRequestKey);
@@ -137,6 +137,7 @@ public class GraphqlGithubClient implements GithubClient {
         getComments(pullRequest, graphqlUrl, headers, pullRequestKey).stream()
             .filter(c -> "Bot".equalsIgnoreCase(c.getAuthor().getType()) && login.equalsIgnoreCase(c.getAuthor().getLogin()))
             .filter(c -> !c.isMinimized())
+            .filter(c -> c.getBody().contains(String.format("**Project ID:** %s\r\n", projectId)))
             .map(Comments.CommentNode::getId)
             .forEach(commentId -> this.minimizeComment(graphqlUrl, headers, commentId));
 
@@ -230,11 +231,11 @@ public class GraphqlGithubClient implements GithubClient {
 
     private static <R> GraphQLResponseEntity<R> executeRequest(
             BiFunction<GraphQLRequestEntity, Class<R>, GraphQLResponseEntity<R>> executor, GraphQLRequestEntity graphQLRequestEntity, Class<R> responseType) {
-        LOGGER.debug("Using request: " + graphQLRequestEntity.getRequest());
+        LOGGER.atDebug().setMessage("Using request: {}").addArgument(graphQLRequestEntity::getRequest).log();
 
         GraphQLResponseEntity<R> response = executor.apply(graphQLRequestEntity, responseType);
 
-        LOGGER.debug("Received response: " + response.toString());
+        LOGGER.debug("Received response: {}", response);
 
         if (!isEmpty(response.getErrors())) {
             List<String> errors = new ArrayList<>();

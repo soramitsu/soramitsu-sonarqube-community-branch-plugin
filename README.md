@@ -1,5 +1,4 @@
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=mc1arke_sonarqube-community-branch-plugin&metric=alert_status)](https://sonarcloud.io/dashboard?id=mc1arke_sonarqube-community-branch-plugin)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/mc1arke/sonarqube-community-branch-plugin/.github/workflows/build.yml?branch=master&logo=github)](https://github.com/mc1arke/sonarqube-community-branch-plugin?workflow=build)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/soramitsu/soramitsu-sonarqube-community-branch-plugin/.github/workflows/build.yml?branch=master&logo=github)](https://github.com/mc1arke/sonarqube-community-branch-plugin?workflow=build)
 
 # Sonarqube Community Branch Plugin
 
@@ -23,6 +22,12 @@ Use the following table to find the correct plugin version for each SonarQube ve
 
 SonarQube Version | Plugin Version
 ------------------|---------------
+10.4              | 1.17.2
+10.3              | 1.16.1
+10.2              | 1.16.0
+10.1              | 1.15.0
+10.0              | 1.15.0
+9.9 (LTS)         | 1.14.0
 9.8+              | 1.14.0
 9.7               | 1.13.0
 9.1 - 9.6         | 1.12.0
@@ -34,6 +39,8 @@ SonarQube Version | Plugin Version
 8.1               | 1.4.0
 7.8 - 8.0         | 1.3.2
 7.4 - 7.7         | 1.0.2
+
+Older versions are listed on the Github release page but are no longer supported.
 
 # Features
 
@@ -70,6 +77,13 @@ Docker image, with the image versions matching the up-stream Sonarqube image ver
 __Note:__ If you're setting the `SONAR_WEB_JAVAADDITIONALOPTS` or `SONAR_CE_JAVAADDITIONALOPTS` environment variables in
 your container launch then you'll need to add the `javaagent` configuration to your overrides to match what's in the
 provided Dockerfile.
+
+## Docker Compose
+
+A `docker-compose.yml` file is provided.
+It uses the env variables available in `.env`.
+
+To use it, clone the repository and execute `docker-compose up`. Note that you need to have docker-compose installed in your system and added to your PATH
 
 ## Kubernetes with official Helm Chart
 
