@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2022 Michael Clarke
+ * Copyright (C) 2020-2024 Michael Clarke
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -31,7 +31,6 @@ import io.aexp.nodes.graphql.Arguments;
 import io.aexp.nodes.graphql.GraphQLRequestEntity;
 import io.aexp.nodes.graphql.GraphQLResponseEntity;
 import io.aexp.nodes.graphql.GraphQLTemplate;
-import io.aexp.nodes.graphql.InputObject;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.sonar.api.issue.Issue;
@@ -148,6 +147,7 @@ class GraphqlGithubClientTest {
         ArgumentCaptor<GraphQLRequestEntity> getViewer = ArgumentCaptor.forClass(GraphQLRequestEntity.class);
         when(graphQLTemplate.query(getViewer.capture(), eq(Viewer.class))).thenReturn(viewerResponseEntity);
 
+        String bodyString = objectMapper.writeValueAsString("**Project ID:** project-key-test" + System.lineSeparator());
         GraphQLResponseEntity<GetRepository> getPullRequestResponseEntity =
             objectMapper.readValue("{" +
                 "\"response\": " +
@@ -159,7 +159,7 @@ class GraphqlGithubClientTest {
                 "          {" +
                 "            \"id\": \"MDEyOklzc3VlQ29tbWVudDE1MDE3\"," +
                 "            \"isMinimized\": false," +
-                "            \"body\": \"**Project ID:** project-key-test\\r\\n\"," +
+                "            \"body\": " + bodyString + "," +
                 "            \"author\": {" +
                 "              \"__typename\": \"Bot\"," +
                 "              \"login\": \"test-sonar\"" +
